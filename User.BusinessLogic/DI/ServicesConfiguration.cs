@@ -2,6 +2,8 @@ using Mapster;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
+using User.BusinessLogic.Services.Implementations;
+using User.BusinessLogic.Services.Interfaces;
 using User.DataAccess.DI;
 
 namespace User.BusinessLogic.DI;
@@ -16,5 +18,7 @@ public static class ServicesConfiguration
             options.Configuration = configuration.GetConnectionString("Redis"));
 
         TypeAdapterConfig.GlobalSettings.Scan(Assembly.GetExecutingAssembly());
+
+        services.AddScoped<IClientService, ClientService>();
     }
 }
