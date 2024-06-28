@@ -11,7 +11,7 @@ public class ClientRepository(UsersDbContext context) : RepositoryBase<UserEntit
         await GetRange(page, pageSize)
             .ToListAsync(cancellationToken);
 
-    public async Task<UserEntity?> GetByIdAsync(Guid id, CancellationToken cancellationToken) =>
+    public async Task<UserEntity> GetByIdAsync(Guid id, CancellationToken cancellationToken) =>
         await GetByCondition(c => c.Id == id)
-            .FirstOrDefaultAsync(cancellationToken);
+            .FirstAsync(cancellationToken);
 }
