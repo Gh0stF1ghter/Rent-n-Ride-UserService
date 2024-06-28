@@ -5,6 +5,8 @@ namespace User.BusinessLogic.Extensions;
 
 internal static class Cache
 {
+    private static readonly string? lifetime = Environment.GetEnvironmentVariable("CACHE_LIFETIME");
+
     public static async Task<T?> GetDataFromCacheAsync<T>(this IDistributedCache distributedCache, string key, CancellationToken cancellationToken)
     {
         var cache = await distributedCache.GetStringAsync(key, cancellationToken);
@@ -22,12 +24,14 @@ internal static class Cache
         if (data is null)
             return;
 
+        if (!int.TryParse(lifetime, out var lifetimeMinutes))
+            return;
+
         var serializedData = JsonConvert.SerializeObject(data);
 
         var options = new DistributedCacheEntryOptions
         {
-            AbsoluteExpirationRelativeToNow = cacheLifetime,
-            SlidingExpiration = TimeSpan.FromMinutes(2)
+            SlidingExpiration = TimeSpan.FromMinutes(lifetimeMinutes)
         };
 
         await distributedCache.SetStringAsync(key, serializedData, options, cancellationToken);
