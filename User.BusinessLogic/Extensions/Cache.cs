@@ -19,7 +19,7 @@ internal static class Cache
         return data;
     }
 
-    public static async Task CacheData<T>(this IDistributedCache distributedCache, T data, TimeSpan cacheLifetime, string key, CancellationToken cancellationToken)
+    public static async Task CacheData<T>(this IDistributedCache distributedCache, T data, string key, CancellationToken cancellationToken)
     {
         if (data is null)
             return;

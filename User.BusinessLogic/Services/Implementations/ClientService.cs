@@ -1,7 +1,5 @@
 using Mapster;
 using Microsoft.Extensions.Caching.Distributed;
-using User.BusinessLogic.Exceptions;
-using User.BusinessLogic.Exceptions.ExceptionMessages;
 using User.BusinessLogic.Extensions;
 using User.BusinessLogic.Models;
 using User.BusinessLogic.Services.Interfaces;
@@ -34,8 +32,7 @@ public class ClientService(IClientRepository clientRepository, IDistributedCache
 
         var clientModel = client.Adapt<ClientModel>();
 
-        var cacheLifetime = TimeSpan.FromMinutes(10);
-        await distributedCache.CacheData(cache, cacheLifetime, key, cancellationToken);
+        await distributedCache.CacheData(cache, key, cancellationToken);
 
         return clientModel;
     }
@@ -53,8 +50,7 @@ public class ClientService(IClientRepository clientRepository, IDistributedCache
 
     public async Task<ClientModel> UpdateAsync(ClientModel newClientModel, CancellationToken cancellationToken)
     {
-        var clientToUpdate = await clientRepository.GetByIdAsync(newClientModel.Id, cancellationToken)
-            ?? throw new NotFoundException(ExceptionMessages.NotFound(nameof(UserEntity), newClientModel.Id));
+        var clientToUpdate = await clientRepository.GetByIdAsync(newClientModel.Id, cancellationToken);
 
         newClientModel.Adapt(clientToUpdate);
 
@@ -63,16 +59,14 @@ public class ClientService(IClientRepository clientRepository, IDistributedCache
         var clientToReturn = clientToUpdate.Adapt<ClientModel>();
 
         var key = nameof(ClientModel) + clientToReturn.Id;
-        var cacheLifetime = TimeSpan.FromMinutes(10);
-        await distributedCache.CacheData(clientToReturn, cacheLifetime, key, cancellationToken);
+        await distributedCache.CacheData(clientToReturn, key, cancellationToken);
 
         return clientToReturn;
     }
 
     public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
     {
-        var clientToDelete = await clientRepository.GetByIdAsync(id, cancellationToken)
-            ?? throw new NotFoundException(ExceptionMessages.NotFound(nameof(UserEntity), id));
+        var clientToDelete = await clientRepository.GetByIdAsync(id, cancellationToken);
 
         await clientRepository.RemoveAsync(clientToDelete, cancellationToken);
 
