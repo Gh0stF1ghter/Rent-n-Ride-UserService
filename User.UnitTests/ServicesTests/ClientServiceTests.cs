@@ -4,7 +4,6 @@ using Newtonsoft.Json;
 using System.Text;
 using Tests.DataGeneration;
 using Tests.Mocks;
-using User.BusinessLogic.Exceptions;
 using User.BusinessLogic.Models;
 using User.BusinessLogic.Services.Implementations;
 using User.DataAccess.Entities;
@@ -60,6 +59,21 @@ public class ClientServiceTests
     }
 
     [Fact]
+    public async Task GetByIdAsync_InvalidId_ThrowsInvalidOperationException()
+    {
+        //Arrange
+        _repositoryMock.GetByIdThrowsException();
+
+        var service = new ClientService(_repositoryMock.Object, _distributedCacheMock.Object);
+
+        //Act
+        var response = async () => await service.GetByIdAsync(Guid.NewGuid(), default);
+
+        //Assert
+        await response.Should().ThrowAsync<InvalidOperationException>();
+    }
+
+    [Fact]
     public async Task GetByIdAsync_EmptyCache_ReturnsClientModel()
     {
         //Arrange
@@ -107,10 +121,10 @@ public class ClientServiceTests
     }
 
     [Fact]
-    public async Task UpdateAsync_InvalidId_ThrowsNotFoundException()
+    public async Task UpdateAsync_InvalidId_ThrowsInvalidOperationException()
     {
         //Arrange
-        _repositoryMock.GetById(null);
+        _repositoryMock.GetByIdThrowsException();
 
         var correctClientModel = _clients[1].Adapt<ClientModel>();
         var service = new ClientService(_repositoryMock.Object, _distributedCacheMock.Object);
@@ -119,7 +133,7 @@ public class ClientServiceTests
         var response = async () => await service.UpdateAsync(correctClientModel, default);
 
         //Assert
-        await response.Should().ThrowAsync<NotFoundException>();
+        await response.Should().ThrowAsync<InvalidOperationException>();
     }
 
     [Fact]
@@ -136,10 +150,10 @@ public class ClientServiceTests
     }
 
     [Fact]
-    public async Task DeleteAsync_InvalidId_ThrowsNotFoundException()
+    public async Task DeleteAsync_InvalidId_ThrowsInvalidOperationException()
     {
         //Arrange
-        _repositoryMock.GetById(null);
+        _repositoryMock.GetByIdThrowsException();
 
         var service = new ClientService(_repositoryMock.Object, _distributedCacheMock.Object);
 
@@ -147,6 +161,6 @@ public class ClientServiceTests
         var response = async () => await service.DeleteAsync(Guid.NewGuid(), default);
 
         //Assert
-        await response.Should().ThrowAsync<NotFoundException>();
+        await response.Should().ThrowAsync<InvalidOperationException>();
     }
 }
