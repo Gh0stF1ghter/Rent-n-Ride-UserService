@@ -21,11 +21,11 @@ internal static class Cache
 
     public static async Task CacheData<T>(this IDistributedCache distributedCache, T data, string key, CancellationToken cancellationToken)
     {
-        if (data is null)
+        if (data is null || lifetime is null)
             return;
 
-        if (!int.TryParse(lifetime, out var lifetimeMinutes))
-            return;
+        if (!double.TryParse(lifetime, out var lifetimeMinutes))
+            throw new InvalidDataException("lifetime is invalid");
 
         var serializedData = JsonConvert.SerializeObject(data);
 
