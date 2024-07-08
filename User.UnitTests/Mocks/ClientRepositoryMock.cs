@@ -21,6 +21,10 @@ internal class ClientRepositoryMock : Mock<IClientRepository>
         Setup(cr => cr.GetByIdAsync(It.IsAny<Guid>(), _anyToken))
             .ThrowsAsync(new InvalidOperationException());
 
+    public void RemoveByIdThrowsException() =>
+        Setup(cr => cr.RemoveByIdAsync(It.IsAny<Guid>(), _anyToken))
+            .ThrowsAsync(new InvalidOperationException());
+
     public void IsExists(bool boolToReturn) =>
         Setup(cr => cr.IsExistsAsync(It.IsAny<Expression<Func<UserEntity, bool>>>(), _anyToken))
         .ReturnsAsync(boolToReturn);

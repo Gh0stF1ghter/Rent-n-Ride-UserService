@@ -153,7 +153,7 @@ public class ClientServiceTests
     public async Task DeleteAsync_InvalidId_ThrowsInvalidOperationException()
     {
         //Arrange
-        _repositoryMock.GetByIdThrowsException();
+        _repositoryMock.RemoveByIdThrowsException();
 
         var service = new ClientService(_repositoryMock.Object, _distributedCacheMock.Object);
 

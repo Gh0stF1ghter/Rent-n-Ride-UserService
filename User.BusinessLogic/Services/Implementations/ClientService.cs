@@ -66,9 +66,7 @@ public class ClientService(IClientRepository clientRepository, IDistributedCache
 
     public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
     {
-        var clientToDelete = await clientRepository.GetByIdAsync(id, cancellationToken);
-
-        await clientRepository.RemoveAsync(clientToDelete, cancellationToken);
+        await clientRepository.RemoveByIdAsync(id, cancellationToken);
 
         var key = nameof(ClientModel) + id;
         await distributedCache.RemoveAsync(key, cancellationToken);
