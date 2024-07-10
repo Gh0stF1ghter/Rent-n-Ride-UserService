@@ -4,5 +4,7 @@ public record ShortClientViewModel(
     string FirstName,
     string LastName,
     string Email,
-    string PhoneNumber
+    string? PhoneNumber,
+    decimal Balance,
+    bool IsRenting
     );
