@@ -29,5 +29,7 @@ internal static class DataGenerator
             .RuleFor(c => c.FirstName, f => f.Name.FirstName())
             .RuleFor(c => c.LastName, f => f.Name.LastName())
             .RuleFor(c => c.Email, f => f.Internet.Email())
-            .RuleFor(c => c.PhoneNumber, f => f.Phone.PhoneNumber());
+            .RuleFor(c => c.PhoneNumber, f => f.Phone.PhoneNumber())
+            .RuleFor(c => c.Balance, f => f.Random.Decimal(0, 50000))
+            .RuleFor(c => c.IsRenting, f => f.Random.Bool());
 }
