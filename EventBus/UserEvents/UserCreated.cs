@@ -1,6 +1,6 @@
-﻿namespace EventBus;
+﻿namespace EventBus.UserEvents;
 
-public record UserCreatedEvent(
+public record UserCreated(
     string FirstName,
     string LastName,
     string Email,

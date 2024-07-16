@@ -1,6 +1,6 @@
-﻿namespace EventBus;
+﻿namespace EventBus.UserEvents;
 
-public record UserUpdatedEvent(
+public record UserUpdated(
     Guid Id,
     string FirstName,
     string LastName,
