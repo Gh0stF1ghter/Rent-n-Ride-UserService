@@ -18,6 +18,8 @@ public static class ServicesConfiguration
         services.AddStackExchangeRedisCache(options =>
             options.Configuration = configuration.GetConnectionString("Redis"));
 
+        services.AddMessageBroker(configuration);
+
         TypeAdapterConfig.GlobalSettings.Scan(Assembly.GetExecutingAssembly());
 
         services.AddScoped<IClientService, ClientService>();
@@ -33,14 +35,7 @@ public static class ServicesConfiguration
 
             cfg.UsingRabbitMq((context, factoryCfg) =>
             {
-                factoryCfg.Host(configuration.GetConnectionString("RabbitMQ"), "/", host =>
-                {
-                    var username = Environment.GetEnvironmentVariable("RABBITMQ_DEFAULT_USER") ?? "user";
-                    var password = Environment.GetEnvironmentVariable("RABBITMQ_DEFAULT_PASSWORD") ?? "password";
-
-                    host.Username(username);
-                    host.Password(password);
-                });
+                factoryCfg.Host(configuration.GetConnectionString("RabbitMQ"), "/");
 
                 factoryCfg.ConfigureEndpoints(context);
             });
