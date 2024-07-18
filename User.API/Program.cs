@@ -26,6 +26,8 @@ app.UseSwaggerUI();
 
 app.UseAuthorization();
 
+app.UseHttpsRedirection();
+
 app.MapControllers();
 
 await app.RunAsync();
