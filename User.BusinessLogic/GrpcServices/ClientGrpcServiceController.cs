@@ -5,7 +5,7 @@ using User.BusinessLogic.Services.Interfaces;
 
 namespace User.BusinessLogic.GrpcServices;
 
-public class ClientGrpcService(IClientService service) : ClientService.ClientServiceBase
+public class ClientGrpcServiceController(IClientService service) : ClientService.ClientServiceBase
 {
     public override async Task<GetClientsInRangeResponse> GetClients(GetClientsInRangeRequest request, ServerCallContext context)
     {

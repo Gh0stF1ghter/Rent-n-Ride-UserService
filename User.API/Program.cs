@@ -1,6 +1,7 @@
 using User.API.DI;
 using User.API.Extensions;
 using User.BusinessLogic.DI;
+using User.BusinessLogic.GrpcServices;
 using User.BusinessLogic.MappingConfigurations;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,5 +30,6 @@ app.UseAuthorization();
 app.UseHttpsRedirection();
 
 app.MapControllers();
+app.MapGrpcService<ClientGrpcServiceController>();
 
 await app.RunAsync();
