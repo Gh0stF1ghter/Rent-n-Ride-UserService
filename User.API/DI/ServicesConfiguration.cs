@@ -20,6 +20,8 @@ public static class ServicesConfiguration
 
         services.ConfigureCors(configuration);
 
+        services.AddGrpc(_ => _.Interceptors.Add<GrpcExceptionHandlingInterceptor>());
+
         services.ConfigureSwagger();
     }
 

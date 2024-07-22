@@ -19,8 +19,6 @@ public static class ServicesConfiguration
 
         TypeAdapterConfig.GlobalSettings.Scan(Assembly.GetExecutingAssembly());
 
-        services.AddGrpc();
-
         services.AddScoped<IClientService, ClientService>();
     }
 }

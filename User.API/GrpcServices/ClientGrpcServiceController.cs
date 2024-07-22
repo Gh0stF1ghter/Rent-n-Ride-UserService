@@ -3,7 +3,7 @@ using Grpc.Core;
 using Mapster;
 using User.BusinessLogic.Services.Interfaces;
 
-namespace User.BusinessLogic.GrpcServices;
+namespace User.API.GrpcServices;
 
 public class ClientGrpcServiceController(IClientService service) : ClientService.ClientServiceBase
 {
