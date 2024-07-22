@@ -1,7 +1,7 @@
 using User.API.DI;
 using User.API.Extensions;
+using User.API.GrpcServices;
 using User.BusinessLogic.DI;
-using User.BusinessLogic.GrpcServices;
 using User.BusinessLogic.MappingConfigurations;
 
 var builder = WebApplication.CreateBuilder(args);
