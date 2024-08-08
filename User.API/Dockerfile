@@ -11,6 +11,7 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["User.API/User.API.csproj", "User.API/"]
 COPY ["User.BusinessLogic/User.BusinessLogic.csproj", "User.BusinessLogic/"]
+COPY ["EventBus/EventBus.csproj", "EventBus/"]
 COPY ["User.DataAccess/User.DataAccess.csproj", "User.DataAccess/"]
 RUN dotnet restore "./User.API/User.API.csproj"
 COPY . .

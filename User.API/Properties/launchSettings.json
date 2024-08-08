@@ -7,7 +7,9 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "POSTGRES_USER": "postgres",
-        "POSTGRES_PASSWORD":"0000"
+        "POSTGRES_PASSWORD": "0000",
+        "RABBITMQ_DEFAULT_USER": "rabbitmq",
+        "RABBITMQ_DEFAULT_PASSWORD": "user"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "http://localhost:5054"
