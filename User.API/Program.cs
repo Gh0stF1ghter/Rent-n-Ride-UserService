@@ -1,5 +1,6 @@
 using User.API.DI;
 using User.API.Extensions;
+using User.API.GrpcServices;
 using User.BusinessLogic.DI;
 using User.BusinessLogic.MappingConfigurations;
 
@@ -26,6 +27,9 @@ app.UseSwaggerUI();
 
 app.UseAuthorization();
 
+app.UseHttpsRedirection();
+
 app.MapControllers();
+app.MapGrpcService<ClientGrpcServiceController>();
 
 await app.RunAsync();
