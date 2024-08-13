@@ -17,9 +17,5 @@ public class ShortClientViewModelValidator : AbstractValidator<ShortClientViewMo
 
         RuleFor(c => c.Email)
             .EmailAddress();
-
-        RuleFor(c => c.PhoneNumber)
-            .Matches(@"^(\+\d{1,3}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$")
-            .When(c => c.PhoneNumber is not null).WithMessage("Phone number must match pattern\nExample: 1234567890 +9211234567890");
     }
 }

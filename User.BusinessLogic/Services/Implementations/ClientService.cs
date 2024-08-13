@@ -15,8 +15,11 @@ public class ClientService(
     IClientRepository clientRepository,
     IDistributedCache distributedCache,
     IManagementTokenService tokenService,
-    IConfiguration configuration) : IClientService
+    IConfiguration configuration
+    ) : IClientService
 {
+    private const string defaultConnection = "Username-Password-Authentication";
+
     public async Task<IEnumerable<ClientModel>> GetRangeAsync(int page, int pageSize, CancellationToken cancellationToken)
     {
         var clients = await clientRepository.GetRangeAsync(page, pageSize, cancellationToken);
@@ -49,13 +52,13 @@ public class ClientService(
         var token = await tokenService.GetTokenAsync(cancellationToken);
         var domain = configuration["Auth0:Domain"];
 
-        var managementClient = new ManagementApiClient(token.AccessToken, new Uri(configuration["Auth0:ManagementAudience"]));
+        var managementClient = new ManagementApiClient(token.AccessToken, domain);
 
         var newClient = clientModel.Adapt<UserEntity>();
 
         var newAuth0Client = clientModel.Adapt<UserCreateRequest>();
 
-        newAuth0Client.Connection = "Username-Password-Authentication";
+        newAuth0Client.Connection = defaultConnection;
 
         var createdClient = await managementClient.Users.CreateAsync(newAuth0Client, cancellationToken);
 
@@ -104,13 +107,16 @@ public class ClientService(
 
         var managementClient = new ManagementApiClient(token.AccessToken, domain);
 
-        var clientToDelete  =await clientRepository.GetByIdAsync(id, cancellationToken);
+        var clientToDelete  = await clientRepository.GetByIdAsync(id, cancellationToken);
+
+        var clientId = clientToDelete.UserId;
+
 
         await clientRepository.RemoveByIdAsync(id, cancellationToken);
 
         var key = nameof(ClientModel) + id;
         await distributedCache.RemoveAsync(key, cancellationToken);
 
-        await managementClient.Users.DeleteAsync(clientToDelete.UserId);
+        await managementClient.Users.DeleteAsync(clientId);
     }
 }
