@@ -22,7 +22,10 @@ public static class ServicesConfiguration
 
         TypeAdapterConfig.GlobalSettings.Scan(Assembly.GetExecutingAssembly());
 
+        services.AddHttpClient();
+
         services.AddScoped<IClientService, ClientService>();
+        services.AddScoped<IManagementTokenService, ManagementTokenService>();
     }
 
     public static void AddMessageBroker(this IServiceCollection services, IConfiguration configuration)
