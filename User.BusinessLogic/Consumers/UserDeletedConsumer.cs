@@ -1,5 +1,4 @@
-﻿using EventBus;
-using EventBus.UserEvents;
+﻿using EventBus.UserEvents;
 using MassTransit;
 using User.BusinessLogic.Services.Interfaces;
 

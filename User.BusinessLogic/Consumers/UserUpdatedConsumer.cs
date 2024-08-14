@@ -1,5 +1,4 @@
-﻿using EventBus;
-using EventBus.UserEvents;
+﻿using EventBus.UserEvents;
 using Mapster;
 using MassTransit;
 using User.BusinessLogic.Models;
