@@ -10,5 +10,6 @@ public static class GlobalMappingSettings
         TypeAdapterConfig.GlobalSettings.Scan(Assembly.GetExecutingAssembly());
         TypeAdapterConfig.GlobalSettings.Default.MaxDepth(2);
         TypeAdapterConfig.GlobalSettings.Default.PreserveReference(true);
+        TypeAdapterConfig.GlobalSettings.Default.IgnoreNullValues(true);
     }
 }
