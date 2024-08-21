@@ -1,4 +1,5 @@
 using Mapster;
+using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
@@ -17,8 +18,27 @@ public static class ServicesConfiguration
         services.AddStackExchangeRedisCache(options =>
             options.Configuration = configuration.GetConnectionString("Redis"));
 
+        services.AddMessageBroker(configuration);
+
         TypeAdapterConfig.GlobalSettings.Scan(Assembly.GetExecutingAssembly());
 
         services.AddScoped<IClientService, ClientService>();
+    }
+
+    public static void AddMessageBroker(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddMassTransit(cfg =>
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+
+            cfg.AddConsumers(assembly);
+
+            cfg.UsingRabbitMq((context, factoryCfg) =>
+            {
+                factoryCfg.Host(configuration.GetConnectionString("RabbitMQ"), "/");
+
+                factoryCfg.ConfigureEndpoints(context);
+            });
+        });
     }
 }
