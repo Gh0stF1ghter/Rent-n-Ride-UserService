@@ -18,8 +18,12 @@ public class ShortClientViewModelValidator : AbstractValidator<ShortClientViewMo
         RuleFor(c => c.Email)
             .EmailAddress();
 
-        RuleFor(c => c.PhoneNumber)
-            .Matches(@"^(\+\d{1,3}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$")
-            .When(c => c.PhoneNumber is not null).WithMessage("Phone number must match pattern\nExample: 1234567890 +9211234567890");
+        RuleFor(c => c.Password)
+            .MinimumLength(8)
+            .Matches(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]*$")
+            .WithMessage("Weak password. Check for one lowercase, one uppercase, one special character and digit");
+
+        RuleFor(c => c.Password)
+            .MaximumLength(20)
     }
 }

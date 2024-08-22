@@ -1,5 +1,4 @@
 ﻿using Mapster;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using User.API.ViewModels;
 using User.API.ViewModels.ShortViewModels;
@@ -63,7 +62,6 @@ public class ClientController(IClientService service) : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    [Authorize("delete:users")]
     [ActionName("DeleteClientById")]
     public async Task Delete([FromRoute] Guid id, CancellationToken cancellationToken)
     {

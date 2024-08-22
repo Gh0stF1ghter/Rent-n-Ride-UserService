@@ -1,11 +1,14 @@
 ﻿using FluentAssertions;
 using Mapster;
+using Moq;
 using Newtonsoft.Json;
+using Rent.UnitTests.Mocks;
 using System.Text;
 using Tests.DataGeneration;
 using Tests.Mocks;
 using User.BusinessLogic.Models;
 using User.BusinessLogic.Services.Implementations;
+using User.BusinessLogic.Services.Interfaces;
 using User.DataAccess.Entities;
 
 namespace Tests.ServicesTests;
@@ -14,6 +17,9 @@ public class ClientServiceTests
 {
     private readonly ClientRepositoryMock _repositoryMock = new();
     private readonly DistributedCacheMock _distributedCacheMock = new();
+    private readonly ConfigurationMock _configurationMock = new();
+    private readonly Mock<IManagementTokenService> _managementTokenServiceMock = new();
+
 
     private readonly List<UserEntity> _clients = DataGenerator.AddClientData(5);
 
@@ -22,6 +28,11 @@ public class ClientServiceTests
         _repositoryMock.GetRange(_clients);
         _repositoryMock.GetById(_clients[0]);
         _repositoryMock.IsExists(true);
+
+        _configurationMock.GetDomain();
+        _configurationMock.GetManagementAudience();
+        _configurationMock.GetClientId();
+        _configurationMock.GetClientSecret();
     }
 
     [Fact]
@@ -30,7 +41,7 @@ public class ClientServiceTests
         //Arrange
         var correctClientModels = _clients.Adapt<IEnumerable<ClientModel>>();
 
-        var service = new ClientService(_repositoryMock.Object, _distributedCacheMock.Object);
+        var service = new ClientService(_repositoryMock.Object, _distributedCacheMock.Object, _managementTokenServiceMock.Object, _configurationMock.Object);
 
         //Act
         var response = await service.GetRangeAsync(1, 1, default);
@@ -49,7 +60,7 @@ public class ClientServiceTests
         var cachedModel = Encoding.UTF8.GetBytes(serializedModel);
         _distributedCacheMock.GetDataFromCache(cachedModel);
 
-        var service = new ClientService(_repositoryMock.Object, _distributedCacheMock.Object);
+        var service = new ClientService(_repositoryMock.Object, _distributedCacheMock.Object, _managementTokenServiceMock.Object, _configurationMock.Object);
 
         //Act
         var response = await service.GetByIdAsync(Guid.NewGuid(), default);
@@ -64,7 +75,7 @@ public class ClientServiceTests
         //Arrange
         _repositoryMock.GetByIdThrowsException();
 
-        var service = new ClientService(_repositoryMock.Object, _distributedCacheMock.Object);
+        var service = new ClientService(_repositoryMock.Object, _distributedCacheMock.Object, _managementTokenServiceMock.Object, _configurationMock.Object);
 
         //Act
         var response = async () => await service.GetByIdAsync(Guid.NewGuid(), default);
@@ -83,7 +94,7 @@ public class ClientServiceTests
         var cachedModel = Encoding.UTF8.GetBytes(serializedModel);
         _distributedCacheMock.GetDataFromCache(cachedModel);
 
-        var service = new ClientService(_repositoryMock.Object, _distributedCacheMock.Object);
+        var service = new ClientService(_repositoryMock.Object, _distributedCacheMock.Object, _managementTokenServiceMock.Object, _configurationMock.Object);
 
         //Act
         var response = await service.GetByIdAsync(Guid.NewGuid(), default);
@@ -97,7 +108,7 @@ public class ClientServiceTests
     {
         //Arrange
         var correctClientModel = _clients[0].Adapt<ClientModel>();
-        var service = new ClientService(_repositoryMock.Object, _distributedCacheMock.Object);
+        var service = new ClientService(_repositoryMock.Object, _distributedCacheMock.Object, _managementTokenServiceMock.Object, _configurationMock.Object);
 
         //Act
         var response = await service.AddAsync(correctClientModel, default);
@@ -111,7 +122,7 @@ public class ClientServiceTests
     {
         //Arrange
         var correctClientModel = _clients[1].Adapt<ClientModel>();
-        var service = new ClientService(_repositoryMock.Object, _distributedCacheMock.Object);
+        var service = new ClientService(_repositoryMock.Object, _distributedCacheMock.Object, _managementTokenServiceMock.Object, _configurationMock.Object);
 
         //Act
         var response = await service.UpdateAsync(correctClientModel, default);
@@ -127,7 +138,7 @@ public class ClientServiceTests
         _repositoryMock.GetByIdThrowsException();
 
         var correctClientModel = _clients[1].Adapt<ClientModel>();
-        var service = new ClientService(_repositoryMock.Object, _distributedCacheMock.Object);
+        var service = new ClientService(_repositoryMock.Object, _distributedCacheMock.Object, _managementTokenServiceMock.Object, _configurationMock.Object);
 
         //Act
         var response = async () => await service.UpdateAsync(correctClientModel, default);
@@ -140,7 +151,7 @@ public class ClientServiceTests
     public async Task DeleteAsync_ClientId_()
     {
         //Arrange
-        var service = new ClientService(_repositoryMock.Object, _distributedCacheMock.Object);
+        var service = new ClientService(_repositoryMock.Object, _distributedCacheMock.Object, _managementTokenServiceMock.Object, _configurationMock.Object);
 
         //Act
         var response = async () => await service.DeleteAsync(Guid.NewGuid(), default);
@@ -155,7 +166,7 @@ public class ClientServiceTests
         //Arrange
         _repositoryMock.RemoveByIdThrowsException();
 
-        var service = new ClientService(_repositoryMock.Object, _distributedCacheMock.Object);
+        var service = new ClientService(_repositoryMock.Object, _distributedCacheMock.Object, _managementTokenServiceMock.Object, _configurationMock.Object);
 
         //Act
         var response = async () => await service.DeleteAsync(Guid.NewGuid(), default);

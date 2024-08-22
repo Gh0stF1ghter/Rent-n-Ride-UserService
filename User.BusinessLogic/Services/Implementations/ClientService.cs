@@ -1,5 +1,8 @@
+using Auth0.ManagementApi;
+using Auth0.ManagementApi.Models;
 using Mapster;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Configuration;
 using User.BusinessLogic.Extensions;
 using User.BusinessLogic.Models;
 using User.BusinessLogic.Services.Interfaces;
@@ -8,8 +11,15 @@ using User.DataAccess.Repositories.Interfaces;
 
 namespace User.BusinessLogic.Services.Implementations;
 
-public class ClientService(IClientRepository clientRepository, IDistributedCache distributedCache) : IClientService
+public class ClientService(
+    IClientRepository clientRepository,
+    IDistributedCache distributedCache,
+    IManagementTokenService tokenService,
+    IConfiguration configuration
+    ) : IClientService
 {
+    private const string defaultConnection = "Username-Password-Authentication";
+
     public async Task<IEnumerable<ClientModel>> GetRangeAsync(int page, int pageSize, CancellationToken cancellationToken)
     {
         var clients = await clientRepository.GetRangeAsync(page, pageSize, cancellationToken);
@@ -39,7 +49,20 @@ public class ClientService(IClientRepository clientRepository, IDistributedCache
 
     public async Task<ClientModel> AddAsync(ClientModel clientModel, CancellationToken cancellationToken)
     {
+        var token = await tokenService.GetTokenAsync(cancellationToken);
+        var domain = configuration["Auth0:Domain"];
+
+        var managementClient = new ManagementApiClient(token.AccessToken, domain);
+
         var newClient = clientModel.Adapt<UserEntity>();
+
+        var newAuth0Client = clientModel.Adapt<UserCreateRequest>();
+
+        newAuth0Client.Connection = defaultConnection;
+
+        var createdClient = await managementClient.Users.CreateAsync(newAuth0Client, cancellationToken);
+
+        newClient.UserId = createdClient.UserId;
 
         await clientRepository.AddAsync(newClient, cancellationToken);
 
@@ -52,7 +75,20 @@ public class ClientService(IClientRepository clientRepository, IDistributedCache
     {
         var clientToUpdate = await clientRepository.GetByIdAsync(newClientModel.Id, cancellationToken);
 
+        var token = await tokenService.GetTokenAsync(cancellationToken);
+        var domain = configuration["Auth0:Domain"];
+
+        var userID = clientToUpdate.UserId;
+
+        var managementClient = new ManagementApiClient(token.AccessToken, domain);
+
         newClientModel.Adapt(clientToUpdate);
+
+        var clientUpdateRequest = clientToUpdate.Adapt<UserUpdateRequest>();
+
+        clientToUpdate.UserId = userID;
+
+        var response = await managementClient.Users.UpdateAsync(clientToUpdate.UserId, clientUpdateRequest, cancellationToken);
 
         await clientRepository.UpdateAsync(clientToUpdate, cancellationToken);
 
@@ -66,9 +102,21 @@ public class ClientService(IClientRepository clientRepository, IDistributedCache
 
     public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
     {
+        var token = await tokenService.GetTokenAsync(cancellationToken);
+        var domain = configuration["Auth0:Domain"];
+
+        var managementClient = new ManagementApiClient(token.AccessToken, domain);
+
+        var clientToDelete  = await clientRepository.GetByIdAsync(id, cancellationToken);
+
+        var clientId = clientToDelete.UserId;
+
+
         await clientRepository.RemoveByIdAsync(id, cancellationToken);
 
         var key = nameof(ClientModel) + id;
         await distributedCache.RemoveAsync(key, cancellationToken);
+
+        await managementClient.Users.DeleteAsync(clientId);
     }
 }
